@@ -34,21 +34,24 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-# Player Variables
-player_x = 50
-player_y = 50
+# Set player to middle of the bottom
+player_x = SCREEN_WIDTH / 2
+player_y = SCREEN_HEIGHT - CHARACTER_HEIGHT
 
 
-# TODO: Add variables for the "enemy" class
+# Add variables for the "Enemy" class
 class Enemy():
     """
     A class of enemy objects that the user should avoid colliding into
     """
     def __init__(self):
-        """Position the incoming enemy at (400, 300)"""
-        self.x = 400
+        """Position the incoming enemy at a random spot"""
+        self.x = random.random() * (SCREEN_WIDTH - SCREEN_HEIGHT)
         self.y = 300
 
+# Instantiate Enemy class twice
+enemy1 = Enemy()
+enemy2 = Enemy()
 
 # Other variables
 velocity = 3
@@ -80,10 +83,9 @@ def draw_text(text, color, font_size, x, y):
     screen.blit(img, (x, y))
 
 # Define a function for resetting an enemy object once it has collided or passed off screen
-def resetEnemy(screenHeight, screenWidth):
-    newEnemy = Enemy()
-    newEnemy.y = 0
-    newEnemy.x = random.random() * (screenWidth - screenHeight)
+def resetEnemy(enemy, screenWidth, characterWidth):
+    enemy.y = 0
+    enemy.x = random.random() * (screenWidth - characterWidth)
 
 ################################################################################
 # GAME LOOP
@@ -93,7 +95,7 @@ def resetEnemy(screenHeight, screenWidth):
 running = True
 while running:
     # Advance the clock
-    # pygame.time.delay(20)
+    pygame.time.delay(20)
 
     # Did the user click the window close button?
     for event in pygame.event.get():
@@ -107,36 +109,37 @@ while running:
         player_x -= velocity
     if keys[pygame.K_RIGHT]:
         player_x += velocity
-    if keys[pygame.K_UP]:
-        player_y -= velocity
-    if keys[pygame.K_DOWN]:
-        player_y += velocity
 
-    # Instantiate an enemy object
-    # TODO: Update the enemy's y position based on its velocity
-    enemy_object = Enemy()
-    enemy_object.y += velocity
+    # Update the enemy y-positions based on its velocity
+    enemy1.y += velocity
+    enemy2.y += velocity
 
 
-    # TODO: If enemy went off the screen, reset it
-    if enemy_object.y > SCREEN_HEIGHT: 
-        resetEnemy(SCREEN_HEIGHT, SCREEN_WIDTH)
+    # If enemy went off the screen, reset it
+    if enemy1.y > SCREEN_HEIGHT: 
+        resetEnemy(enemy1, SCREEN_WIDTH, CHARACTER_WIDTH)
+    if enemy2.y > SCREEN_HEIGHT: 
+        resetEnemy(enemy2, SCREEN_WIDTH, CHARACTER_WIDTH)
 
 
-    # TODO: If player collides with enemy, reset it & set points to 0
-    if is_colliding(player_x, player_y, enemy_object.x, enemy_object.y, CHARACTER_WIDTH, CHARACTER_HEIGHT):
-        points = 0
-        resetEnemy(SCREEN_HEIGHT, SCREEN_WIDTH)
+    # If player collides with enemy, reset it & set points to 0
+    if is_colliding(player_x, player_y, enemy1.x, enemy1.y, CHARACTER_WIDTH, CHARACTER_HEIGHT):
+        points -= 10
+        resetEnemy(enemy1, SCREEN_WIDTH, CHARACTER_WIDTH)
+    if is_colliding(player_x, player_y, enemy2.x, enemy2.y, CHARACTER_WIDTH, CHARACTER_HEIGHT):
+        points -= 10
+        resetEnemy(enemy2, SCREEN_WIDTH, CHARACTER_WIDTH)
 
     # Fill screen with white
     screen.fill(WHITE)
 
     # Draw the player as a blue square
     pygame.draw.rect(screen, BLUE, (player_x, player_y, CHARACTER_WIDTH, CHARACTER_HEIGHT))
-    
 
-    # TODO: Draw the enemy as a red square
-    pygame.draw.rect(screen, RED, (enemy_object.x, enemy_object.y, CHARACTER_WIDTH, CHARACTER_HEIGHT))
+
+    # Draw each enemy as a red square
+    pygame.draw.rect(screen, RED, (enemy1.x, enemy1.y, CHARACTER_WIDTH, CHARACTER_HEIGHT))
+    pygame.draw.rect(screen, RED, (enemy2.x, enemy2.y, CHARACTER_WIDTH, CHARACTER_HEIGHT))
 
 
     # Draw the points
