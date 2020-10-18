@@ -9,7 +9,7 @@
 # 2. Create multiple enemies that can all fall at once.
 ################################################################################
 
-# YouTube video timer: 0:06:31
+# YouTube video timer: 0:19:11
 
 import pygame
 import random
