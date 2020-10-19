@@ -303,13 +303,14 @@ def main():
 # Create a home menu that lets the user start by clicking any button and close by clicking the quit button
 def main_menu():
     # Font for the welcome message
-    title_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 65)
+    title_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 45)
     run = True
     while run:
         # Print the welcome message in the center in white font with the space background image
         WINDOW.blit(BG, (0, 0))
         title_label = title_font.render("Welcome! Press the mouse to begin.", 1, (255, 255, 255))
         WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, HEIGHT / 2))
+        pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
