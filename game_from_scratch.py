@@ -31,7 +31,7 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 # Background scaled to fit entire screen
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
 
-# Create abstract class for ships
+# Create abstract class for player and enemy ship classes to inherit
 class Ship:
     def __init__(self, x, y, health = 100):
         self.x = x
@@ -43,7 +43,43 @@ class Ship:
         self.cool_down_counter = 0
 
     def draw(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50), 0)
+        window.blit(self.ship_img, (self.x, self.y))
+
+    def get_width(self):
+        return self.ship_img.get_width()
+    
+    def get_height(self):
+        return self.ship_img.get_height()
+
+# Create a class for the player ship
+class Player(Ship):
+    def __init__(self, x, y, health = 100):
+        super().__init__(x, y, health)
+        self.ship_img = YELLOW_SPACE_SHIP
+        self.laser_img = YELLOW_LASER
+        # Define mask to be pixel-perfect
+        self.mask = pygame.mask.from_surface(self.ship_img)
+        self.max_health = health
+
+# Create a class for the enemy ships
+class Enemy(Ship):
+    # Define a dictionary for the color styles of the enemy ships
+    COLOR_MAP = {
+        "red": (RED_SPACE_SHIP, RED_LASER),
+        "blue": (BLUE_SPACE_SHIP, BLUE_LASER),
+        "green": (GREEN_SPACE_SHIP, GREEN_LASER)
+    }
+
+    def __init__(self, x, y, color, health = 100):
+        super().__init__(x, y, health)
+        self.ship_img, self.laser_img = self.COLOR_MAP[color]
+        # Define mask to be pixel-perfect
+        self.mask = pygame.mask.from_surface(self.ship_img)
+
+    # Define downward movement for enemy ship
+    def move(self, velocity):
+        self.y += velocity
+
 
 
 # Main function
@@ -57,7 +93,8 @@ def main():
     # Font
     main_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 50)
 
-    ship = Ship(WIDTH / 2, HEIGHT - 100)
+    # Initialize a player ship by instantiating a Player object
+    player = Player(WIDTH / 2, HEIGHT - 100)
 
     # Clock object
     clock = pygame.time.Clock()
@@ -73,7 +110,7 @@ def main():
         WINDOW.blit(lives_label, (WIDTH - lives_label.get_width() - 20, 15))
         WINDOW.blit(level_label, (20, 15))
 
-        ship.draw(WINDOW)
+        player.draw(WINDOW)
         pygame.display.update()
 
     while run:
@@ -89,14 +126,15 @@ def main():
 
         # Dictionary for key presses
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            ship.x -= player_velocity
-        if keys[pygame.K_RIGHT]:
-            ship.x += player_velocity
-        if keys[pygame.K_UP]:
-            ship.y -= player_velocity
-        if keys[pygame.K_DOWN]:
-            ship.y += player_velocity
+        # Move keys with arrows and keep player within the bounds of the screen
+        if keys[pygame.K_LEFT] and player.x - player_velocity > 0:
+            player.x -= player_velocity
+        if keys[pygame.K_RIGHT] and player.x + player_velocity + player.get_width() < WIDTH:
+            player.x += player_velocity
+        if keys[pygame.K_UP] and player.y - player_velocity > 0:
+            player.y -= player_velocity
+        if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() < HEIGHT:
+            player.y += player_velocity
 
 
 main()
