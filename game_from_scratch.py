@@ -110,6 +110,17 @@ class Player(Ship):
                         objs.remove(obj)
                         self.lasers.remove(laser)
 
+    # Override the draw() method inherited from the parent class to include the health bar
+    def draw(self, window):
+        super().draw(window)
+        self.healthbar(window)
+
+    
+    # Display a health bar for the player ship with a diminishing green rectangle overlaid on a red rectangle
+    def healthbar(self, window):
+        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
+        pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health / self.max_health), 10))
+
 
 # Create a class for the enemy ships
 class Enemy(Ship):
@@ -258,7 +269,7 @@ def main():
             player.x += player_velocity
         if keys[pygame.K_UP] and player.y - player_velocity > 0:
             player.y -= player_velocity
-        if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() < HEIGHT:
+        if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() + 10 < HEIGHT:
             player.y += player_velocity
         if keys[pygame.K_SPACE]:
             player.shoot()
@@ -272,10 +283,17 @@ def main():
             # Select a time (such as once every 3 seconds) for how often each enemy should fire a laser
             if random.randrange(0, 3 * FPS) == 1:
                 enemy.shoot()
+
+            # Decrement the player's health by 20 if an enemy ship collides with the player ship
+            if collide(enemy, player):
+                player.health -= 20
+                enemies.remove(enemy)
             # Decrement the lives when an enemy passes the lower boundary of the screen and modify the enemies list
-            if enemy.y + enemy.get_height() > HEIGHT:
+            elif enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
+            
+
 
         # Move the lasers from the player to attack the enemies
         player.move_lasers(-laser_velocity, enemies)
