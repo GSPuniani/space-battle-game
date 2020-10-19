@@ -108,7 +108,8 @@ class Player(Ship):
                 for obj in objs:
                     if laser.collision(obj):
                         objs.remove(obj)
-                        self.lasers.remove(laser)
+                        if laser in self.lasers:
+                            self.lasers.remove(laser)
 
     # Override the draw() method inherited from the parent class to include the health bar
     def draw(self, window):
@@ -255,10 +256,10 @@ def main():
                 enemy = Enemy(random.randint(10, WIDTH - 100), random.randint(-2000, -150), random.choice(["red", "blue", "green"]))
                 enemies.append(enemy)
 
-        # Quit game when user clicks exit button
+        # Quit game (by closing the Python program) when user clicks exit button
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                quit()
 
         # Dictionary for key presses
         keys = pygame.key.get_pressed()
@@ -269,7 +270,7 @@ def main():
             player.x += player_velocity
         if keys[pygame.K_UP] and player.y - player_velocity > 0:
             player.y -= player_velocity
-        if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() + 10 < HEIGHT:
+        if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() + 15 < HEIGHT:
             player.y += player_velocity
         if keys[pygame.K_SPACE]:
             player.shoot()
@@ -299,5 +300,23 @@ def main():
         player.move_lasers(-laser_velocity, enemies)
 
 
+# Create a home menu that lets the user start by clicking any button and close by clicking the quit button
+def main_menu():
+    # Font for the welcome message
+    title_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 65)
+    run = True
+    while run:
+        # Print the welcome message in the center in white font with the space background image
+        WINDOW.blit(BG, (0, 0))
+        title_label = title_font.render("Welcome! Press the mouse to begin.", 1, (255, 255, 255))
+        WINDOW.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, HEIGHT / 2))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                main()
 
-main()
+    pygame.quit()
+
+
+main_menu()
