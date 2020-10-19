@@ -5,7 +5,10 @@ Space Battle is a simple 2-D arcade game built with the `pygame` library. This g
 
 I made this project for the Make School Fall Intensive. I had no previous experience with `pygame`, so this project was an opportunity for me to explore that library by coding a simple game that I would enjoy. Thus, this project was more of an introductory challenge for myself rather than a product that solves an issue for others. 
 
-![The welcome screen](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "The welcome screen")
+![The Welcome Screen](https://github.com/GSPuniani/space-battle-game/blob/main/assets/welcome_screen.png "The Welcome Screen")
+![Gameplay Sample 1](https://github.com/GSPuniani/space-battle-game/blob/main/assets/gameplay_sample1.png "Gameplay Sample 1")
+![Gameplay Sample 2](https://github.com/GSPuniani/space-battle-game/blob/main/assets/gameplay_sample2.png "Gameplay Sample 2")
+![The Lost Screen](https://github.com/GSPuniani/space-battle-game/blob/main/assets/lost_screen.png "The Lost Screen")
 
 
 ## Running the Program
