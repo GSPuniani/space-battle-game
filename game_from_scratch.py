@@ -9,7 +9,7 @@ import random
 pygame.font.init()
 
 # Set display
-WIDTH, HEIGHT = 750, 750
+WIDTH, HEIGHT = 900, 750
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Battle")
 
@@ -87,11 +87,23 @@ def main():
     run = True
     # Frames per second
     FPS = 60
-    level = 1
+    level = 0
     lives = 5
     player_velocity = 5
     # Font
     main_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 50)
+    # Font for "lost" screen
+    lost_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 65)
+
+    # Set a Boolean for the "lost" status
+    lost = False
+    # Set count-down timer for "lost" status before resetting
+    lost_counter = 0
+
+    enemies = []
+    # Number of enemies in a given wave
+    wave_amount = 5
+    enemy_veloctiy = 1
 
     # Initialize a player ship by instantiating a Player object
     player = Player(WIDTH / 2, HEIGHT - 100)
@@ -110,14 +122,45 @@ def main():
         WINDOW.blit(lives_label, (WIDTH - lives_label.get_width() - 20, 15))
         WINDOW.blit(level_label, (20, 15))
 
+        # Draw the enemy ships
+        for enemy in enemies:
+            enemy.draw(WINDOW)
+
+        # Draw the player ship after the enemy ships so it will appear over them if it overlaps with any of them
         player.draw(WINDOW)
+
+        if lost:
+            lost_label = lost_font.render("Game Over! You Lost!!", 1, (255, 0, 0))
+            WINDOW.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, HEIGHT/2))
+        
         pygame.display.update()
 
     while run:
         # Run game at consistent speed across all computers
         clock.tick(FPS)
+
         # Update all of the display surfaces
         redraw_window()
+
+        # The player loses when all lives are spent or the health bar is depleted
+        if lives <= 0 or player.health <= 0:
+            lost = True
+            lost_counter += 1
+
+        # Stop running the game if the "lost" message appears for more than 3 seconds
+        if lost:
+            if lost_counter > FPS * 3:
+                run = False
+            else:
+                continue
+
+
+        if len(enemies) == 0:
+            level += 1
+            wave_amount += 5
+            for i in range(wave_amount):
+                enemy = Enemy(random.randint(10, WIDTH - 100), random.randint(-2000, -150), random.choice(["red", "blue", "green"]))
+                enemies.append(enemy)
 
         # Quit game when user clicks exit button
         for event in pygame.event.get():
@@ -135,6 +178,16 @@ def main():
             player.y -= player_velocity
         if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() < HEIGHT:
             player.y += player_velocity
+
+        # Loop through a copy of the enemies list to modify the original list directly
+        for enemy in enemies[:]:
+            # Move enemies according to their velocity
+            enemy.move(enemy_veloctiy)
+            # Decrement the lives when an enemy passes the lower boundary of the screen and modify the enemies list
+            if enemy.y + enemy.get_height() > HEIGHT:
+                lives -= 1
+                enemies.remove(enemy)
+
 
 
 main()
