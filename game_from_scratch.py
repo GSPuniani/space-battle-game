@@ -31,6 +31,20 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 # Background scaled to fit entire screen
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
 
+# Create abstract class for ships
+class Ship:
+    def __init__(self, x, y, health = 100):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.ship_img = None
+        self.laser_img = None
+        self.lasers = []
+        self.cool_down_counter = 0
+
+    def draw(self, window):
+        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50), 0)
+
 
 # Main function
 def main():
@@ -39,10 +53,15 @@ def main():
     FPS = 60
     level = 1
     lives = 5
+    player_velocity = 5
     # Font
     main_font = pygame.font.Font(os.path.join("assets", "nasalization-rg.ttf"), 50)
+
+    ship = Ship(WIDTH / 2, HEIGHT - 100)
+
     # Clock object
     clock = pygame.time.Clock()
+
 
     # Below are functions defined here within main() since they use other variables defined in main()
 
@@ -53,6 +72,8 @@ def main():
         level_label = main_font.render(f"Level: {level}", 1, (255, 100, 0))
         WINDOW.blit(lives_label, (WIDTH - lives_label.get_width() - 20, 15))
         WINDOW.blit(level_label, (20, 15))
+
+        ship.draw(WINDOW)
         pygame.display.update()
 
     while run:
@@ -65,6 +86,17 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        # Dictionary for key presses
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            ship.x -= player_velocity
+        if keys[pygame.K_RIGHT]:
+            ship.x += player_velocity
+        if keys[pygame.K_UP]:
+            ship.y -= player_velocity
+        if keys[pygame.K_DOWN]:
+            ship.y += player_velocity
 
 
 main()
